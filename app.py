@@ -58,11 +58,11 @@ excluded_repos = {
     "MasteringMCU2", "Liuma-engine", "lowcode-tools", "Diff-Plugin", "mfish-nocode-view",
     "backroad", "zcbor", "powerfx-samples", "MemoryNet", "igop", "underTheHoodOfExecutables",
     "StringReloads", "lowcode-b", "EigenTrajectory", "pluto", "pixiebrix-extension",
-    "qLDPC", "Visio", "Hack-SQL", "cow-Low-code", "LoRA-Pro", "OTE-GAN",
-    "lowcode-code-generator-demo", "QuadPrior", "UIGO", "SoRA", "grid-form",
+    "qLDPC", "Visio", "Hack-SQL", "cow-Low-code", "LoRA-Pro", "OTE-GAN", "opsli-ui", "three-editor",
+    "lowcode-code-generator-demo", "QuadPrior", "UIGO", "SoRA", "grid-form", "CcView",
     "DegAE_DegradationAutoencoder", "www-project-top-10-low-code-no-code-security-risks",
-    "Vibration-Based-Fault-Diagnosis-with-Low-Delay", "alignment-attribution-code",
-    "ReGitLint", "pandas-gpt", "yao-knowledge"
+    "Vibration-Based-Fault-Diagnosis-with-Low-Delay", "alignment-attribution-code", "VideoUIKit-Web-React",
+    "ReGitLint", "pandas-gpt", "yao-knowledge", "snac", "relora", "mettle", "Tenon", "noncode-projects-2024", "EvLight"
 }
 
 # Filter out excluded repositories
@@ -154,7 +154,7 @@ if repos:
     st.write("For more information about low-code see")
     st.write("- [This book](https://lowcode-book.com/)")
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
-    st.write(" - And play with low-code via our open source [low-code-tools](https://github.com/BESSER-PEARL/BESSER)")
+    st.write(" - And play with low-code via our open source [low-code-tool](https://github.com/BESSER-PEARL/BESSER)")
    
 
 else:
