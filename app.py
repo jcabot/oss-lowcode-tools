@@ -113,6 +113,7 @@ if repos:
             "Name": repo["name"],
             "Stars⭐": repo['stargazers_count'],
             "Last Updated": repo['pushed_at'].split('T')[0],
+            "First Commit": repo['created_at'].split('T')[0],
             "URL": repo['html_url'],
             "Forks": repo['forks'],
             "Issues": repo['open_issues'],
