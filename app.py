@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 import streamlit as st
 import requests
+import matplotlib.pyplot as plt
+import seaborn as sns
+from collections import Counter
 
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"
@@ -76,7 +79,7 @@ st.set_page_config(layout="wide")
 st.title("Low-Code Repositories in GitHub by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
 st.write("Use the sliders to filter the repositories. Click on a column header to sort the table.")
 st.write("Hover over the table to search for specific reports or export the table as a CSV file.")
-
+st.write("A few global stats are also available at the bottom of the page.")
 
 # Add star filter slider
 min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50, step=50)
@@ -117,7 +120,6 @@ if repos:
             "URL": repo['html_url'],
             "Forks": repo['forks'],
             "Issues": repo['open_issues'],
-            "Watchers": repo['watchers'],
             "Language": repo['language'],
             "License": repo['license']['name'] if repo['license'] else "No license",
             "Description": (repo["description"] or "No description")[:200],
@@ -157,6 +159,58 @@ if repos:
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
     st.write(" - And play with low-code via our open source [low-code-tool](https://github.com/BESSER-PEARL/BESSER)")
    
+
+    st.subheader("Some global stats")
+
+    # Create a list of first commit dates
+    first_commit_dates = [datetime.strptime(repo['created_at'].split('T')[0], '%Y-%m-%d').date() for repo in filtered_repos]
+
+    # Grouping the data by year
+    years = [date.year for date in first_commit_dates]
+    year_counts = Counter(years)
+
+    # Plotting the distribution of first commit dates by year
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=list(year_counts.keys()), y=list(year_counts.values()))
+    plt.title('Distribution of First Commit Dates by Year')
+    plt.xlabel('Year of First Commit')
+    plt.ylabel('Number of Repositories')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    st.pyplot(plt, use_container_width=False)
+
+    # Create a list of star counts
+    star_counts = [repo['stargazers_count'] for repo in filtered_repos]
+
+    # Plotting the distribution of repositories by star count using a boxplot
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x=star_counts)  # Changed to x=star_counts for better clarity
+    plt.title('Distribution of Repositories by Star Count')
+    plt.xlabel('Number of Stars')
+    plt.ylabel('Number of Repositories')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    st.pyplot(plt, use_container_width=False)
+
+
+    # Create a list of languages from filtered_repos
+    languages = [repo['language'] for repo in filtered_repos if repo['language']]
+
+    # Count the occurrences of each language
+    language_counts = Counter(languages)
+
+    # Plotting the aggregation of repositories by language
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=list(language_counts.keys()), y=list(language_counts.values()))
+    plt.title('Aggregation of Repositories by Language')
+    plt.xlabel('Programming Language')
+    plt.ylabel('Number of Repositories')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    st.pyplot(plt, use_container_width=False)
 
 else:
     st.write("No repositories found or there was an error fetching data.")
