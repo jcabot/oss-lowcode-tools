@@ -4,13 +4,12 @@ Based on a search in GitHub. Dashboard created as part of the [BESSER project](h
 
 ## Selection method
 The selection method is based on the following inclusion criteria:
-
 - Repositories that declare themselves as low-code projects
-- Repositories with stars ≥ 50
-- Repositories with last commit at least 1 year ago
-
+- Repositories with 50+ stars
+- Active repositories (last commit not more than 1 year ago)
+- Tools aimed at generating any software component (AI, dashboard, database or full applications)
 and exclusion criteria
-- Repositories with information in other languages than English
+- Repositories with no information in English
 - Repositories that were just created to host the source code of a published article
 - Repositories that are awesome lists or collection of resources
 

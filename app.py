@@ -80,11 +80,12 @@ st.title("Low-Code Repositories in GitHub by the [BESSER team](https://github.co
 st.write("Use the sliders to filter the repositories. Click on a column header to sort the table.")
 st.write("Hover over the table to search for specific reports or export the table as a CSV file.")
 st.write("A few global stats are also available at the bottom of the page.")
+st.write("Suggest improvements via the [GitHub repository of this dashboard](https://github.com/jcabot/oss-lowcode-tools)")
 
 # Add star filter slider
 min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50, step=50)
 
-#Add a date filter slider 
+# Add a date filter slider
 # Calculate date range, also storing the value in the session to avoid the slider resetting all the time due to
 # streamlit thinking the min max value have changed and need to restart
 
@@ -144,14 +145,13 @@ if repos:
 
     st.write("The selection method is based on the following inclusion criteria:")
     st.write("- Repositories that declare themselves as low-code projects")
-    st.write("- Repositories with stars ≥ 50") 
-    st.write("- Repositories with last commit at least 1 year ago")
-    st.write("")
+    st.write("- Repositories with more than 50 stars")
+    st.write("- Active repositories (last commit is no more than 1 year ago")
+    st.write("- Tool aims to generate any component of a software application, including AI components, dashboards or full applications")
     st.write("and exclusion criteria:")
-    st.write("- Repositories with information in other languages than English")
+    st.write("- Repositories with no information in English")
     st.write("- Repositories that were just created to host the source code of a published article")
     st.write("- Repositories that are awesome lists or collection of resources")
-
 
     st.write("The final list is the intersection of the above criteria. The final list has also been manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment.")
     st.write("For more information about low-code see")
