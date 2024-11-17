@@ -79,11 +79,13 @@ repos = st.session_state.repos
 
 # Display the table
 st.set_page_config(layout="wide")
-st.title("Low-Code Repositories in GitHub by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
-st.write("Use the sliders to filter the repositories. Click on a column header to sort the table.")
-st.write("Hover over the table to search for specific reports or export the table as a CSV file.")
-st.write("A few global stats are also available at the bottom of the page.")
-st.write("Suggest improvements via the [GitHub repository of this dashboard](https://github.com/jcabot/oss-lowcode-tools)")
+st.title("Dashboard of Open-Source Low-Code Tools in GitHub")
+st.subheader("Maintained by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
+st.write("Quick notes:")
+st.write("- Use the sliders to filter the repositories. Click on a column header to sort the table.")
+st.write("- Hover over the table to search for specific reports or export the table as a CSV file.")
+st.write("- A few global stats are also available at the bottom of the page.")
+st.write("- Suggest improvements via the [GitHub repository of this dashboard](https://github.com/jcabot/oss-lowcode-tools)")
 
 # Add star filter slider
 min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50, step=50)
