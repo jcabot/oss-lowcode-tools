@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
+from collections import Counter
 import streamlit as st
 import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
-from collections import Counter
+
 
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"
@@ -53,17 +54,19 @@ excluded_repos = {
     "langwatch", "web-builder", "awesome-nocode-lowcode", "LLFlow", "AS-Editor",
     "mfish-nocode", "naas", "Awesome-ECCV2024-ECCV2020-Low-Level-Vision", "dataCompare",
     "AIVoiceChat", "illa", "praxis-ide", "low-level-design", "HuggingFists", "dagr",
-    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard", "palu"
-    "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision",
+    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard", "Palu"
+    "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision", "pocketblocks"
     "plugins", "LLFormer", "vue-admin", "Low-Code", "FTC-Skystone-Dark-Angels-Romania-2020",
     "WrldTmpl8", "daas-start-kit", "Meta3D", "css-selector-tool", "corebos", "wave-apps",
     "self-hosted", "Automation-workflow", "banglanmt", "Nalu", "no-code-architects-toolkit",
     "MasteringMCU2", "Liuma-engine", "lowcode-tools", "Diff-Plugin", "mfish-nocode-view",
     "backroad", "zcbor", "powerfx-samples", "MemoryNet", "igop", "underTheHoodOfExecutables",
-    "StringReloads", "lowcode-b", "EigenTrajectory", "pluto", "pixiebrix-extension",
+    "StringReloads", "lowcode-b", "EigenTrajectory", "pluto", "pixiebrix-extension", "dozer",
+    "vite-vue3-lowcode",
     "qLDPC", "Visio", "Hack-SQL", "cow-Low-code", "LoRA-Pro", "OTE-GAN", "opsli-ui", "three-editor",
-    "lowcode-code-generator-demo", "QuadPrior", "UIGO", "SoRA", "grid-form", "CcView",
-    "DegAE_DegradationAutoencoder", "www-project-top-10-low-code-no-code-security-risks",
+    "lowcode-code-generator-demo", "QuadPrior", "UIGO", "SoRA", "grid-form", "CcView", "verus",
+    "fastgraphml", "arcane.cpp", "lowcode-engine-ext", "Liuma-platform", "lowcode-plugins", "turbo",
+    "DegAE_DegradationAutoencoder", "www-project-top-10-low-code-no-code-security-risks", "lowcode-materials",
     "Vibration-Based-Fault-Diagnosis-with-Low-Delay", "alignment-attribution-code", "VideoUIKit-Web-React",
     "ReGitLint", "pandas-gpt", "yao-knowledge", "snac", "relora", "mettle", "Tenon", "noncode-projects-2024", "EvLight"
 }
