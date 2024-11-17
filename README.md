@@ -13,7 +13,7 @@ and exclusion criteria
 - Repositories that were just created to host the source code of a published article
 - Repositories that are awesome lists or collection of resources
 
-The final list is the intersection of the above criteria manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment. For more information about low-code, see:
+The final list is the intersection of the above criteria manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software development. For more information about low-code, see:
 
 - [This book](https://lowcode-book.com/)
 - [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)

@@ -158,7 +158,7 @@ if repos:
     st.write("- Repositories that were just created to host the source code of a published article")
     st.write("- Repositories that are awesome lists or collection of resources")
 
-    st.write("The final list is the intersection of the above criteria. The final list has also been manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment.")
+    st.write("The final list is the intersection of the above criteria. The final list has also been manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software development.")
     st.write("For more information about low-code see")
     st.write("- [This book](https://lowcode-book.com/)")
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
