@@ -33,6 +33,41 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
 if 'repos' not in st.session_state:
     st.session_state.repos = fetch_low_code_repos()
 
+# List of excluded repositories
+excluded_repos = {
+    "JeecgBoot", "supervision", "amis", "APIJSON", "awesome-lowcode", "LoRA", "activepieces", 
+    "gop", "pycaret", "viztracer", "joint", "mometa", "asmjit", "NullAway", 
+    "self-hosted-ai-starter-kit", "sparrow", "smart-admin", "tracecat", "dooringx", 
+    "Genie.jl", "instill-core", "metarank", "dataprep", "hyperlight", "go-streams",
+    "dashpress", "lowcode-demo", "diboot", "steedos-platform", "opsli-boot", 
+    "PiML-Toolbox", "marsview", "openDataV", 
+    "Awesome-CVPR2024-CVPR2021-CVPR2020-Low-Level-Vision", "dart_native", 
+    "low-level-programming", "vue-component-creater-ui", "ovine", "vlife", "beelzebub",
+    "mtbird", "Awesome-CVPR2024-Low-Level-Vision", "create-chart", "crusher",
+    "yuzi-generator", "pc-Dooring", "citrus", "Conduit", "react-admin-firebase",
+    "apex", "fire-hpp", "awesome-lowcode", "karamel", "flowpipe", "fast-trade", "pd",
+    "MetaLowCode", "vue-low-code", "css-text-portrait-builder", "awesome-low-code",
+    "langwatch", "web-builder", "awesome-nocode-lowcode", "LLFlow", "AS-Editor",
+    "mfish-nocode", "naas", "Awesome-ECCV2024-ECCV2020-Low-Level-Vision", "dataCompare",
+    "AIVoiceChat", "illa", "praxis-ide", "low-level-design", "HuggingFists", "dagr",
+    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard",
+    "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision",
+    "plugins", "LLFormer", "vue-admin", "Low-Code", "FTC-Skystone-Dark-Angels-Romania-2020",
+    "WrldTmpl8", "daas-start-kit", "Meta3D", "css-selector-tool", "corebos",
+    "self-hosted", "Automation-workflow", "banglanmt", "Nalu", "no-code-architects-toolkit",
+    "MasteringMCU2", "Liuma-engine", "lowcode-tools", "Diff-Plugin", "mfish-nocode-view",
+    "backroad", "zcbor", "powerfx-samples", "MemoryNet", "igop", "underTheHoodOfExecutables",
+    "StringReloads", "lowcode-b", "EigenTrajectory", "pluto", "pixiebrix-extension",
+    "qLDPC", "Visio", "Hack-SQL", "cow-Low-code", "LoRA-Pro", "OTE-GAN",
+    "lowcode-code-generator-demo", "QuadPrior", "UIGO", "SoRA", "grid-form",
+    "DegAE_DegradationAutoencoder", "www-project-top-10-low-code-no-code-security-risks",
+    "Vibration-Based-Fault-Diagnosis-with-Low-Delay", "alignment-attribution-code",
+    "ReGitLint", "pandas-gpt", "yao-knowledge"
+}
+
+# Filter out excluded repositories
+st.session_state.repos = [repo for repo in st.session_state.repos if repo['name'] not in excluded_repos]
+
 repos = st.session_state.repos
 
 
@@ -66,9 +101,11 @@ min_date = st.slider(
 )
 
 
+
 if repos:
     # Create a table with repository information. Only repos with stars >= min_stars and last commit >= min_date are shown
     table_data = []
+
     filtered_repos = [repo for repo in repos if repo['stargazers_count'] >= min_stars and datetime.strptime(repo['pushed_at'].split('T')[0], '%Y-%m-%d').date() >= min_date.date()]
   
     for repo in filtered_repos:
@@ -100,15 +137,22 @@ if repos:
     st.subheader("Selection method")
 
     #Write the selection method
-    st.write("The selection method is based on the following initial criteria:")
-    st.write("- Repositories that declare themselves as low-code projects stars >= 50")
-    st.write("- Repositories with stars >= 50")
-    st.write("- Repositories with last commit at least 1 year ago")
-    st.write("- Repositories with information in English")
 
-    st.write("The final list is the intersection of the above criteria manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment.")
+
+    st.write("The selection method is based on the following inclusion criteria:")
+    st.write("- Repositories that declare themselves as low-code projects")
+    st.write("- Repositories with stars ≥ 50") 
+    st.write("- Repositories with last commit at least 1 year ago")
+    st.write("")
+    st.write("and exclusion criteria:")
+    st.write("- Repositories with information in other languages than English")
+    st.write("- Repositories that were just created to host the source code of a published article")
+    st.write("- Repositories that are awesome lists or collection of resources")
+
+
+    st.write("The final list is the intersection of the above criteria. The final list has also been manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment.")
     st.write("For more information about low-code see")
-    st.write("- [This book](https://lowcode-book.com/")
+    st.write("- [This book](https://lowcode-book.com/)")
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
     st.write(" - And play with low-code via our open source [low-code-tools](https://github.com/BESSER-PEARL/BESSER)")
    
