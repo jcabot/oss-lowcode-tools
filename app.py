@@ -38,14 +38,18 @@ repos = st.session_state.repos
 
 # Display the table
 st.set_page_config(layout="wide")
-st.title("Low-Code Repositories in GitHub")
+st.title("Low-Code Repositories in GitHub by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
+st.write("Use the sliders to filter the repositories. Click on a column header to sort the table.")
+st.write("Hover over the table to search for specific reports or export the table as a CSV file.")
 
 
 # Add star filter slider
 min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50, step=50)
 
 #Add a date filter slider 
-# Calculate date range
+# Calculate date range, also storing the value in the session to avoid the slider resetting all the time due to
+# streamlit thinking the min max value have changed and need to restart
+
 if 'today' not in st.session_state:
     st.session_state.today = datetime.today()
 
@@ -61,13 +65,6 @@ min_date = st.slider(
     step=timedelta(days=1)
 )
 
-#min_date = st.slider(
-#    "Last Commit",
-#    min_value=datetime(2023, 11, 18),
-#    max_value=datetime(2024, 11, 18),
-#    value=datetime(2023, 11, 18),
-#    step=timedelta(days=1)
-#)
 
 if repos:
     # Create a table with repository information. Only repos with stars >= min_stars and last commit >= min_date are shown
@@ -110,7 +107,7 @@ if repos:
     st.write("- Repositories with information in English")
 
     st.write("The final list is the intersection of the above criteria manually curated to remove projects that use low-code in a different sense of what we mean by low-code in software develpoment.")
-    st.write("For more about the meaning of low-code see")
+    st.write("For more information about low-code see")
     st.write("- [This book](https://lowcode-book.com/")
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
     st.write(" - And play with low-code via our open source [low-code-tools](https://github.com/BESSER-PEARL/BESSER)")
