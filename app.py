@@ -50,10 +50,10 @@ excluded_repos = {
     "langwatch", "web-builder", "awesome-nocode-lowcode", "LLFlow", "AS-Editor",
     "mfish-nocode", "naas", "Awesome-ECCV2024-ECCV2020-Low-Level-Vision", "dataCompare",
     "AIVoiceChat", "illa", "praxis-ide", "low-level-design", "HuggingFists", "dagr",
-    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard",
+    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard", "palu"
     "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision",
     "plugins", "LLFormer", "vue-admin", "Low-Code", "FTC-Skystone-Dark-Angels-Romania-2020",
-    "WrldTmpl8", "daas-start-kit", "Meta3D", "css-selector-tool", "corebos",
+    "WrldTmpl8", "daas-start-kit", "Meta3D", "css-selector-tool", "corebos", "wave-apps",
     "self-hosted", "Automation-workflow", "banglanmt", "Nalu", "no-code-architects-toolkit",
     "MasteringMCU2", "Liuma-engine", "lowcode-tools", "Diff-Plugin", "mfish-nocode-view",
     "backroad", "zcbor", "powerfx-samples", "MemoryNet", "igop", "underTheHoodOfExecutables",
