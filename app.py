@@ -2,9 +2,7 @@ from datetime import datetime, timedelta
 from collections import Counter
 import streamlit as st
 import requests
-import matplotlib.pyplot as plt
-import seaborn as sns
-
+import plotly.graph_objects as go
 
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"
@@ -163,42 +161,52 @@ if repos:
     st.write("- [This book](https://lowcode-book.com/)")
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
     st.write(" - And play with low-code via our open source [low-code-tool](https://github.com/BESSER-PEARL/BESSER)")
-   
 
     st.subheader("Some global stats")
 
     # Create a list of first commit dates
-    first_commit_dates = [datetime.strptime(repo['created_at'].split('T')[0], '%Y-%m-%d').date() for repo in filtered_repos]
+    first_commit_dates = [datetime.strptime(repo['created_at'].split('T')[0], '%Y-%m-%d').date() for repo in
+                          filtered_repos]
 
     # Grouping the data by year
     years = [date.year for date in first_commit_dates]
     year_counts = Counter(years)
 
     # Plotting the distribution of first commit dates by year
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x=list(year_counts.keys()), y=list(year_counts.values()))
-    plt.title('Distribution of First Commit Dates by Year')
-    plt.xlabel('Year of First Commit')
-    plt.ylabel('Number of Repositories')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    st.pyplot(plt, use_container_width=False)
+    year_bar_chart = go.Figure(
+        data=[
+            go.Bar(
+                x=list(year_counts.keys()),
+                y=list(year_counts.values()),
+            )
+        ]
+    )
+    year_bar_chart.update_layout(
+        title="Distribution of First Commit Dates by Year",
+        xaxis_title="Year of First Commit",
+        yaxis_title="Number of Repositories",
+        xaxis=dict(tickangle=45)
+    )
 
     # Create a list of star counts
     star_counts = [repo['stargazers_count'] for repo in filtered_repos]
 
     # Plotting the distribution of repositories by star count using a boxplot
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(x=star_counts)  # Changed to x=star_counts for better clarity
-    plt.title('Distribution of Repositories by Star Count')
-    plt.xlabel('Number of Stars')
-    plt.ylabel('Number of Repositories')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    st.pyplot(plt, use_container_width=False)
-
+    star_box_plot = go.Figure(
+        data=[
+            go.Box(
+                x=star_counts,
+                boxpoints="outliers",  # Show only outliers as points
+                jitter=0.5,
+            )
+        ]
+    )
+    star_box_plot.update_layout(
+        title="Distribution of Repositories by Star Count",
+        xaxis_title="",
+        yaxis_title="Number of Stars",
+        xaxis=dict(showticklabels=False)
+    )
 
     # Create a list of languages from filtered_repos
     languages = [repo['language'] for repo in filtered_repos if repo['language']]
@@ -207,15 +215,27 @@ if repos:
     language_counts = Counter(languages)
 
     # Plotting the aggregation of repositories by language
-    plt.figure(figsize=(12, 6))
-    sns.barplot(x=list(language_counts.keys()), y=list(language_counts.values()))
-    plt.title('Aggregation of Repositories by Language')
-    plt.xlabel('Programming Language')
-    plt.ylabel('Number of Repositories')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
+    language_bar_chart = go.Figure(
+        data=[
+            go.Bar(
+                x=list(language_counts.keys()),
+                y=list(language_counts.values()),
+            )
+        ]
+    )
+    language_bar_chart.update_layout(
+        title="Aggregation of Repositories by Language",
+        xaxis_title="Programming Language",
+        yaxis_title="Number of Repositories",
+        xaxis=dict(tickangle=45)
+    )
 
-    st.pyplot(plt, use_container_width=False)
+    cols = st.columns(2)
+    with cols[0]:
+        st.plotly_chart(year_bar_chart, use_container_width=True)
+        st.plotly_chart(language_bar_chart, use_container_width=True)
+    with cols[1]:
+        st.plotly_chart(star_box_plot, use_container_width=True)
 
 else:
     st.write("No repositories found or there was an error fetching data.")
