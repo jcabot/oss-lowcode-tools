@@ -2,6 +2,8 @@
 
 Based on a search in GitHub. Dashboard created as part of the [BESSER project](https://github.com/besser-pearl)
 
+See the [dashboard live](https://oss-lowcode-tools.streamlit.app/).
+
 ## Selection method
 The selection method is based on the following inclusion criteria:
 - Repositories that declare themselves as low-code projects
