@@ -3,6 +3,7 @@ from collections import Counter
 import streamlit as st
 import requests
 import plotly.graph_objects as go
+from analysis import display_analysis
 
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"
@@ -79,11 +80,31 @@ repos = st.session_state.repos
 st.set_page_config(layout="wide")
 st.title("Dashboard of Open-Source Low-Code Tools in GitHub")
 st.subheader("Maintained by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
-st.write("Quick notes:")
+
+# Add table of contents
+st.markdown("""
+## Table of Contents
+- [Quick Notes](#quick-notes)
+- [Repository Filters](#repository-filters)
+- [Repository Table](#repository-table)
+- [Selection Method](#selection-method)
+- [Global Statistics](#global-statistics)
+- [Repository Analysis](#repository-analysis)
+    - [No-Code Analysis](#analysis-for-no-code)
+    - [Modeling Analysis](#analysis-for-modeling)
+    - [UML Analysis](#analysis-for-uml)
+""")
+
+st.markdown("<a name='quick-notes'></a>", unsafe_allow_html=True)
+st.write("## Quick notes:")
 st.write("- Use the sliders to filter the repositories. Click on a column header to sort the table.")
 st.write("- Hover over the table to search for specific reports or export the table as a CSV file.")
 st.write("- A few global stats are also available at the bottom of the page.")
 st.write("- Suggest improvements via the [GitHub repository of this dashboard](https://github.com/jcabot/oss-lowcode-tools)")
+
+# Add anchors before each section
+st.markdown("<a name='repository-filters'></a>", unsafe_allow_html=True)
+st.write("## Repository Filters")
 
 # Add star filter slider
 min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50, step=50)
@@ -141,6 +162,7 @@ if repos:
         hide_index=True
     )
 
+    st.markdown("<a name='selection-method'></a>", unsafe_allow_html=True)
     st.subheader("Selection method")
 
     #Write the selection method
@@ -162,6 +184,7 @@ if repos:
     st.write("- [This blog post](https://modeling-languages.com/low-code-vs-model-driven/)")
     st.write(" - And play with low-code via our open source [low-code-tool](https://github.com/BESSER-PEARL/BESSER)")
 
+    st.markdown("<a name='global-statistics'></a>", unsafe_allow_html=True)
     st.subheader("Some global stats")
 
     # Create a list of first commit dates
@@ -239,3 +262,14 @@ if repos:
 
 else:
     st.write("No repositories found or there was an error fetching data.")
+
+
+if 'repos' in st.session_state and st.session_state.repos:
+    st.write("## Low-code tools self-defining as well as no-code, modeling or UML tools")
+    
+    for keyword in ['no-code', 'modeling', 'uml']:
+        st.write(f"### Analysis for '{keyword}'")
+        display_analysis(st.session_state.repos, keyword)
+        st.markdown("---")
+else:
+    st.warning("Please fetch repositories first using the search functionality above.")
