@@ -93,6 +93,7 @@ st.markdown("""
     - [No-Code Analysis](#analysis-for-no-code)
     - [Modeling Analysis](#analysis-for-modeling)
     - [UML Analysis](#analysis-for-uml)
+    - [AI Analysis](#analysis-for-ai)
 """)
 
 st.markdown("<a name='quick-notes'></a>", unsafe_allow_html=True)
@@ -265,9 +266,9 @@ else:
 
 
 if 'repos' in st.session_state and st.session_state.repos:
-    st.write("## Low-code tools self-defining as well as no-code, modeling or UML tools")
+    st.write("## Repository Analysis")
     
-    for keyword in ['no-code', 'modeling', 'uml']:
+    for keyword in ['no-code', 'modeling', 'uml', 'ai']:
         st.write(f"### Analysis for '{keyword}'")
         display_analysis(st.session_state.repos, keyword)
         st.markdown("---")

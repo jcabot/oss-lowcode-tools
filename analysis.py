@@ -13,9 +13,9 @@ def analyze_repos_multiple_keywords(repos, keywords, category_name):
         
         # Check if any of the keywords match
         matches = any(
-            keyword in description or 
-            keyword in name or 
-            any(keyword in topic for topic in topics)
+            (keyword in description if keyword != 'ai' else (' ai ' in description  or ' ai-' in description)) or
+            (keyword in name if keyword != 'ai' else (' ai ' in name  or ' ai-' in name)) or
+            any(keyword == topic.strip() for topic in topics)
             for keyword in keywords
         )
         
@@ -32,7 +32,8 @@ def display_analysis(repos, category):
     keyword_sets = {
         'no-code': ['nocode', 'no-code'],
         'modeling': ['model', 'modeling', 'model-driven', 'model-based'],
-        'uml': ['uml', 'unified modeling language']
+        'uml': ['uml', 'unified modeling language'],
+        'ai': ['ai', 'artificial intelligence']
     }
     
     # Define excluded repos for modeling category
