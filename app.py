@@ -7,6 +7,9 @@ from analysis import display_analysis
 import pandas as pd
 import os
 
+# Set page configuration FIRST - must be the very first Streamlit command
+st.set_page_config(layout="wide")
+
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"
 
@@ -120,7 +123,6 @@ repos = st.session_state.repos
 
 
 # Display the table
-st.set_page_config(layout="wide")
 st.title("Dashboard of Open-Source Low-Code Tools in GitHub")
 st.subheader("Maintained by the [BESSER team](https://github.com/BESSER-PEARL/BESSER)")
 
