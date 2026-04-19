@@ -20,12 +20,26 @@ st.set_page_config(layout="wide")
 GITHUB_API_URL = "https://api.github.com/search/repositories"
 
 # Function to fetch repositories. Only repos with stars > 50 and updated in the last year are shown
-# Returns (repos, api_succeeded) so callers know whether live data was used.
-def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=100, max_pages=10):
+# Returns (repos, data_from_live_api).
+# Pass *github_token* so search requests use the GitHub API with auth — on Streamlit Cloud the
+# shared egress IP hits the anonymous search rate limit (60/h) almost immediately; without a
+# token the app falls back to bundled CSV and auto-snapshot is skipped.
+def fetch_low_code_repos(
+    query="low-code",
+    sort="stars",
+    order="desc",
+    per_page=100,
+    max_pages=10,
+    github_token=None,
+):
     query += " stars:>=" + "50" + " pushed:>=" + (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
     all_repos = []
     api_failed = False
-    
+
+    headers = {"Accept": "application/vnd.github+json"}
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
+
     for page in range(1, max_pages + 1):
         params = {
             "q": query,
@@ -35,7 +49,7 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
             "page": page
         }
         try:
-            response = requests.get(GITHUB_API_URL, params=params, timeout=10)
+            response = requests.get(GITHUB_API_URL, params=params, headers=headers, timeout=10)
             if response.status_code == 200:
                 repos = response.json()["items"]
                 if not repos:
@@ -49,9 +63,11 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
             st.error(f"GitHub API request failed: {str(e)}")
             api_failed = True
             break
-    
+
+    loaded_from_snapshot = False
     # If API failed or returned no data, load from bundled snapshot CSV
     if api_failed or not all_repos:
+        loaded_from_snapshot = True
         try:
             if os.path.exists(SNAPSHOT_CSV_PATH):
                 st.warning(
@@ -85,12 +101,20 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
         except Exception as e:
             st.error(f"Failed to load snapshot data: {str(e)}")
 
-    return all_repos, not api_failed
+    data_from_live_api = not loaded_from_snapshot
+    return all_repos, data_from_live_api
 
 
 # Fetch repositories
+try:
+    _github_token = st.secrets.get("GITHUB_TOKEN")
+except Exception:
+    _github_token = None
+
 if 'repos' not in st.session_state:
-    st.session_state.repos, st.session_state.api_succeeded = fetch_low_code_repos()
+    st.session_state.repos, st.session_state.data_from_live_api = fetch_low_code_repos(
+        github_token=_github_token
+    )
 
 # List of excluded repositories
 excluded_repos = {
@@ -109,8 +133,8 @@ excluded_repos = {
     "langwatch", "web-builder", "awesome-nocode-lowcode", "LLFlow", "AS-Editor",
     "mfish-nocode", "naas", "Awesome-ECCV2024-ECCV2020-Low-Level-Vision", "dataCompare",
     "AIVoiceChat", "illa", "praxis-ide", "low-level-design", "HuggingFists", "dagr",
-    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard", "Palu"
-    "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision", "pocketblocks"
+    "pddon-win", "all-classification-templetes-for-ML", "node-red-dashboard", "Palu",
+    "Liuma-platform", "crudapi-admin-web", "Awesome-ICCV2023-Low-Level-Vision", "pocketblocks",
     "plugins", "LLFormer", "vue-admin", "Low-Code", "FTC-Skystone-Dark-Angels-Romania-2020",
     "WrldTmpl8", "daas-start-kit", "Meta3D", "css-selector-tool", "corebos", "wave-apps",
     "self-hosted", "Automation-workflow", "banglanmt", "Nalu", "no-code-architects-toolkit",
@@ -132,28 +156,55 @@ st.session_state.repos = [repo for repo in st.session_state.repos if repo['name'
 # Auto-snapshot: persist the current live list when no recent snapshot exists.
 # If a GITHUB_TOKEN secret is configured the snapshot is also committed to the
 # repo so it survives Streamlit Cloud restarts (ephemeral filesystem).
-if st.session_state.get('api_succeeded') and not st.session_state.get('snapshot_taken'):
-    saved_path = snapshot_utils.auto_snapshot(st.session_state.repos)
-    st.session_state.snapshot_taken = True
-    if saved_path:
-        filename = os.path.basename(saved_path)
-        try:
-            gh_token = st.secrets.get("GITHUB_TOKEN")
-        except Exception:
-            gh_token = None
+if not st.session_state.get('snapshot_taken'):
+    if st.session_state.get('data_from_live_api'):
+        saved_path = snapshot_utils.auto_snapshot(st.session_state.repos)
+        st.session_state.snapshot_taken = True
+        if saved_path:
+            filename = os.path.basename(saved_path)
+            try:
+                gh_token = st.secrets.get("GITHUB_TOKEN")
+            except Exception:
+                gh_token = None
 
-        if gh_token:
-            gh_repo   = st.secrets.get("GITHUB_REPO",   "jcabot/oss-lowcode-tools")
-            gh_branch = st.secrets.get("GITHUB_BRANCH", "main")
-            ok = snapshot_utils.commit_snapshot_to_github(
-                saved_path, gh_token, gh_repo, gh_branch
-            )
-            if ok:
-                st.success(f"New snapshot committed to the repository: snapshots/{filename}")
+            if gh_token:
+                gh_repo = st.secrets.get("GITHUB_REPO", "jcabot/oss-lowcode-tools")
+                gh_branch = st.secrets.get("GITHUB_BRANCH", "main")
+                ok, err_detail = snapshot_utils.commit_snapshot_to_github(
+                    saved_path, gh_token, gh_repo, gh_branch
+                )
+                if ok:
+                    st.success(
+                        f"New snapshot committed to the repository: snapshots/{filename}"
+                    )
+                else:
+                    msg = (
+                        f"Snapshot saved locally but could not be committed to GitHub: "
+                        f"{filename}"
+                    )
+                    if err_detail:
+                        msg += f" ({err_detail})"
+                    st.warning(msg)
             else:
-                st.warning(f"Snapshot saved locally but could not be committed to GitHub: {filename}")
+                st.success(f"New snapshot saved locally: {filename}")
+        elif not snapshot_utils.should_take_snapshot():
+            pass  # recent snapshot already exists in snapshots/
         else:
-            st.success(f"New snapshot saved locally: {filename}")
+            # should_take_snapshot but saved_path None => file exists for today (same session rerun)
+            pass
+    elif _github_token:
+        st.info(
+            "GitHub Search API fell back to bundled CSV (rate limit or HTTP error). "
+            "Auto-snapshot was skipped — live API data is required. "
+            "Ensure **GITHUB_TOKEN** is set in app secrets so search requests are authenticated "
+            "(much higher rate limits)."
+        )
+    else:
+        st.info(
+            "GitHub Search API fell back to bundled CSV. Auto-snapshot was skipped. "
+            "Add **GITHUB_TOKEN** to Streamlit secrets so searches use authenticated "
+            "requests (recommended on Streamlit Cloud)."
+        )
 
 repos = st.session_state.repos
 

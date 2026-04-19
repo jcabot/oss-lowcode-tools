@@ -83,11 +83,11 @@ def commit_snapshot_to_github(
     token: str,
     repo: str = "jcabot/oss-lowcode-tools",
     branch: str = "main",
-) -> bool:
+) -> tuple[bool, str | None]:
     """Commit the snapshot CSV at *local_path* to GitHub via the Contents API.
 
     Uses a personal access token with 'contents: write' permission.
-    Returns True on success, False otherwise.
+    Returns (success, error_detail_or_None).
     """
     filename = os.path.basename(local_path)
     repo_path = f"snapshots/{filename}"
@@ -114,4 +114,10 @@ def commit_snapshot_to_github(
         payload["sha"] = sha
 
     response = requests.put(url, headers=headers, json=payload)
-    return response.status_code in (200, 201)
+    if response.status_code in (200, 201):
+        return True, None
+    try:
+        err = response.json().get("message", response.text)
+    except Exception:
+        err = response.text
+    return False, f"HTTP {response.status_code}: {err[:200]}"
