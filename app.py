@@ -3,7 +3,6 @@ from collections import Counter
 import streamlit as st
 import requests
 import plotly.graph_objects as go
-from analysis import display_analysis
 import pandas as pd
 import os
 import snapshot_utils
@@ -15,6 +14,11 @@ SNAPSHOT_CSV_PATH = os.path.join(SNAPSHOTS_DIR, SNAPSHOT_CSV_FILENAME)
 
 # Set page configuration FIRST - must be the very first Streamlit command
 st.set_page_config(layout="wide")
+
+# Import after set_page_config: the module imports Streamlit/plotly and avoids init-order issues
+# on Streamlit Cloud. Module is named keyword_analysis (not "analysis") to avoid clashing with
+# Streamlit's multipage/script registry keys.
+from keyword_analysis import display_analysis
 
 # GitHub API endpoint for searching repositories
 GITHUB_API_URL = "https://api.github.com/search/repositories"

@@ -82,4 +82,4 @@ def display_analysis(repos, category):
         } for repo in matching_repos]
         st.table(data)
     else:
-        st.write(f"No repositories found mentioning '{category}'") 
+        st.write(f"No repositories found mentioning '{category}'")
