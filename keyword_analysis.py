@@ -1,5 +1,34 @@
+import re
+
 import streamlit as st
 import plotly.graph_objects as go
+
+# Whole-word / phrase matching for software "modeling" — substring "model" matches inside
+# unrelated words (e.g. remodel, remodeling) and is far too noisy for descriptions.
+_MODELING_PHRASE = re.compile(
+    r'\b(?:model-driven|model-based|modeling)\b|\bunified\s+modeling\s+language\b',
+    re.I,
+)
+_MODEL_WORD = re.compile(r'\bmodels?\b', re.I)
+
+
+def _matches_modeling(description: str, name: str, topics: list[str]) -> bool:
+    """True if name/description/topics suggest MDE / software modeling (not substring 'model' in 'remodel')."""
+    text = f"{description} {name}"
+    if _MODELING_PHRASE.search(text):
+        return True
+    if _MODEL_WORD.search(text):
+        return True
+    for raw in topics:
+        t = (raw or '').lower().strip()
+        if not t:
+            continue
+        if t in {'model-driven', 'model-based', 'modeling', 'mda', 'mde'}:
+            return True
+        if 'model-driven' in t or 'model-based' in t or 'modeling' in t:
+            return True
+    return False
+
 
 def analyze_repos_multiple_keywords(repos, keywords, category_name):
     """Analyze repositories for multiple keywords within a category"""
@@ -10,14 +39,17 @@ def analyze_repos_multiple_keywords(repos, keywords, category_name):
         description = (repo.get('description', '') or '').lower()
         name = (repo.get('name', '') or '').lower()
         topics = [t.lower() for t in repo.get('topics', [])]
-        
-        # Check if any of the keywords match
-        matches = any(
-            (keyword in description if keyword != 'ai' else (' ai ' in description  or ' ai-' in description)) or
-            (keyword in name if keyword != 'ai' else (' ai ' in name  or ' ai-' in name)) or
-            any(keyword == topic.strip() for topic in topics)
-            for keyword in keywords
-        )
+
+        if category_name == 'modeling':
+            matches = _matches_modeling(description, name, topics)
+        else:
+            # Check if any of the keywords match
+            matches = any(
+                (keyword in description if keyword != 'ai' else (' ai ' in description or ' ai-' in description)) or
+                (keyword in name if keyword != 'ai' else (' ai ' in name or ' ai-' in name)) or
+                any(keyword == topic.strip() for topic in topics)
+                for keyword in keywords
+            )
         
         if matches:
             matching_repos.append(repo)
@@ -26,8 +58,8 @@ def analyze_repos_multiple_keywords(repos, keywords, category_name):
             
     return matching_repos, non_matching_repos
 
-def display_analysis(repos, category):
-    """Display pie chart and table for a specific category analysis"""
+def display_analysis(table_repos, category):
+    """Pie chart + table for *category*. *table_repos* must be the same list as the main repository table."""
     # Define keyword sets for each category
     keyword_sets = {
         'no-code': ['nocode', 'no-code'],
@@ -40,19 +72,30 @@ def display_analysis(repos, category):
     modeling_exclusions = {'langflow', 'ludwig', 'alan-sdk-web', 'otto-m8'}
     
     # Filter out specific repos for modeling category
-    repos_to_analyze = repos
+    repos_to_analyze = table_repos
     if category == 'modeling':
-        repos_to_analyze = [repo for repo in repos if repo['name'] not in modeling_exclusions]
-    
-    matching_repos, non_matching_repos = analyze_repos_multiple_keywords(
-        repos_to_analyze, 
-        keyword_sets[category], 
-        category
+        repos_to_analyze = [
+            repo for repo in table_repos if repo["name"] not in modeling_exclusions
+        ]
+
+    allowed_urls = frozenset(
+        r.get("html_url") for r in table_repos if r.get("html_url")
     )
+
+    matching_repos, _non_matching_repos = analyze_repos_multiple_keywords(
+        repos_to_analyze,
+        keyword_sets[category],
+        category,
+    )
+
+    # Hard guarantee: listed rows are only repos from the table list (same slider-filtered set).
+    matching_repos = [r for r in matching_repos if r.get("html_url") in allowed_urls]
+    n_match = len(matching_repos)
+    n_non_match = len(repos_to_analyze) - n_match
     
     fig = go.Figure(data=[go.Pie(
         labels=[f'Mentions {category}', f'No {category} mention'],
-        values=[len(matching_repos), len(non_matching_repos)],
+        values=[n_match, n_non_match],
         hole=0.3,
         marker_colors=['#2ecc71', '#e74c3c']
     )])

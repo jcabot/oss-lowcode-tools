@@ -419,16 +419,18 @@ if repos:
     with cols[1]:
         st.plotly_chart(star_box_plot, use_container_width=True)
 
-else:
-    st.write("No repositories found or there was an error fetching data.")
-
-
-if 'repos' in st.session_state and st.session_state.repos:
+    # Keyword breakdowns use *only* filtered_repos — the same objects as the dataframe above
+    # for this run (same slider values). Nested here so analysis never runs without the table.
+    st.markdown("<a name='repository-analysis'></a>", unsafe_allow_html=True)
     st.write("## Repository Analysis")
-    
-    for keyword in ['no-code', 'modeling', 'uml', 'ai']:
+    st.caption(
+        "Only repositories that appear in the repository table above (with your current "
+        "Minimum Stars and Last Commit settings) are included; each subsection is a subset of that list."
+    )
+    for keyword in ["no-code", "modeling", "uml", "ai"]:
         st.write(f"### Analysis for '{keyword}'")
         display_analysis(filtered_repos, keyword)
         st.markdown("---")
+
 else:
-    st.warning("Please fetch repositories first using the search functionality above.")
+    st.write("No repositories found or there was an error fetching data.")
