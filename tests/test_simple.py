@@ -14,10 +14,10 @@ import sys
 import pandas as pd
 
 def test_snapshot_loading():
-    """Test that snapshot.csv loads correctly."""
-    print("Testing snapshot.csv loading...")
+    """Test that bundled snapshot CSV loads correctly."""
+    print("Testing snapshot CSV loading...")
     try:
-        df = pd.read_csv('snapshot.csv', encoding='utf-8')
+        df = pd.read_csv('snapshots/snapshot-2025-06-06.csv', encoding='utf-8')
         print(f"[OK] Loaded {len(df)} repositories")
         print(f"[OK] Sample repo: {df.iloc[0]['Name']} ({df.iloc[0]['Stars⭐']} stars)")
         return True
@@ -43,7 +43,7 @@ def test_data_conversion():
     """Test data format conversion."""
     print("\nTesting data conversion...")
     try:
-        df = pd.read_csv('snapshot.csv', encoding='utf-8')
+        df = pd.read_csv('snapshots/snapshot-2025-06-06.csv', encoding='utf-8')
         row = df.iloc[0]
         
         # Convert to API format

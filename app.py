@@ -7,6 +7,11 @@ from analysis import display_analysis
 import pandas as pd
 import os
 
+# Bundled CSV fallback under snapshots/ (filename reflects date added to this repo)
+SNAPSHOTS_DIR = "snapshots"
+SNAPSHOT_CSV_FILENAME = "snapshot-2025-06-06.csv"
+SNAPSHOT_CSV_PATH = os.path.join(SNAPSHOTS_DIR, SNAPSHOT_CSV_FILENAME)
+
 # Set page configuration FIRST - must be the very first Streamlit command
 st.set_page_config(layout="wide")
 
@@ -43,13 +48,14 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
             api_failed = True
             break
     
-    # If API failed or returned no data, load from snapshot.csv
+    # If API failed or returned no data, load from bundled snapshot CSV
     if api_failed or not all_repos:
         try:
-            snapshot_path = "snapshot.csv"
-            if os.path.exists(snapshot_path):
-                st.warning("⚠️ GitHub API is unavailable. Loading data from snapshot.csv instead.")
-                df = pd.read_csv(snapshot_path, encoding='utf-8')
+            if os.path.exists(SNAPSHOT_CSV_PATH):
+                st.warning(
+                    f"⚠️ GitHub API is unavailable. Loading data from {SNAPSHOT_CSV_PATH} instead."
+                )
+                df = pd.read_csv(SNAPSHOT_CSV_PATH, encoding='utf-8')
                 
                 # Convert CSV data back to GitHub API format
                 all_repos = []
@@ -71,7 +77,9 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
                 
                 st.info(f"✅ Loaded {len(all_repos)} repositories from snapshot data.")
             else:
-                st.error("GitHub API failed and no snapshot.csv file found.")
+                st.error(
+                    f"GitHub API failed and {SNAPSHOT_CSV_PATH} was not found."
+                )
         except Exception as e:
             st.error(f"Failed to load snapshot data: {str(e)}")
     
