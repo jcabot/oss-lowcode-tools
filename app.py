@@ -153,12 +153,25 @@ excluded_repos = {
 # Filter out excluded repositories
 st.session_state.repos = [repo for repo in st.session_state.repos if repo['name'] not in excluded_repos]
 
+# Default "Repository Table" filters (must match slider defaults below): min stars 50, last commit
+# within the last year. Snapshots should store this visible list, not the raw post-search list.
+if "today" not in st.session_state:
+    st.session_state.today = datetime.today()
+_one_year_ago = st.session_state.today - timedelta(days=365)
+repos_for_default_table_view = [
+    repo
+    for repo in st.session_state.repos
+    if repo["stargazers_count"] >= 50
+    and datetime.strptime(repo["pushed_at"].split("T")[0], "%Y-%m-%d").date()
+    >= _one_year_ago.date()
+]
+
 # Auto-snapshot: persist the current live list when no recent snapshot exists.
 # If a GITHUB_TOKEN secret is configured the snapshot is also committed to the
 # repo so it survives Streamlit Cloud restarts (ephemeral filesystem).
 if not st.session_state.get('snapshot_taken'):
     if st.session_state.get('data_from_live_api'):
-        saved_path = snapshot_utils.auto_snapshot(st.session_state.repos)
+        saved_path = snapshot_utils.auto_snapshot(repos_for_default_table_view)
         st.session_state.snapshot_taken = True
         if saved_path:
             filename = os.path.basename(saved_path)
@@ -245,9 +258,6 @@ min_stars = st.slider("Minimum Stars", min_value=50, max_value=100000, value=50,
 # Add a date filter slider
 # Calculate date range, also storing the value in the session to avoid the slider resetting all the time due to
 # streamlit thinking the min max value have changed and need to restart
-
-if 'today' not in st.session_state:
-    st.session_state.today = datetime.today()
 
 today = st.session_state.today
 one_year_ago = today - timedelta(days=365)
