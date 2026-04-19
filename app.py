@@ -25,7 +25,10 @@ GITHUB_API_URL = "https://api.github.com/search/repositories"
 # shared egress IP hits the anonymous search rate limit (60/h) almost immediately; without a
 # token the app falls back to bundled CSV and auto-snapshot is skipped.
 def fetch_low_code_repos(
-    query="low-code",
+    # Quoted phrases match GitHub search *literally*, so only repos whose name/description/
+    # README/topics contain one of these exact forms are returned. This avoids matches
+    # coming from unrelated tokens like "low-level" + "code(s)".
+    query='"low-code" OR "lowcode" OR "low code"',
     sort="stars",
     order="desc",
     per_page=100,
