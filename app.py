@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from analysis import display_analysis
 import pandas as pd
 import os
+import snapshot_utils
 
 # Bundled CSV fallback under snapshots/ (filename reflects date added to this repo)
 SNAPSHOTS_DIR = "snapshots"
@@ -19,6 +20,7 @@ st.set_page_config(layout="wide")
 GITHUB_API_URL = "https://api.github.com/search/repositories"
 
 # Function to fetch repositories. Only repos with stars > 50 and updated in the last year are shown
+# Returns (repos, api_succeeded) so callers know whether live data was used.
 def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=100, max_pages=10):
     query += " stars:>=" + "50" + " pushed:>=" + (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
     all_repos = []
@@ -82,13 +84,13 @@ def fetch_low_code_repos(query="low-code", sort="stars", order="desc", per_page=
                 )
         except Exception as e:
             st.error(f"Failed to load snapshot data: {str(e)}")
-    
-    return all_repos
+
+    return all_repos, not api_failed
 
 
 # Fetch repositories
 if 'repos' not in st.session_state:
-    st.session_state.repos = fetch_low_code_repos()
+    st.session_state.repos, st.session_state.api_succeeded = fetch_low_code_repos()
 
 # List of excluded repositories
 excluded_repos = {
@@ -126,6 +128,13 @@ excluded_repos = {
 
 # Filter out excluded repositories
 st.session_state.repos = [repo for repo in st.session_state.repos if repo['name'] not in excluded_repos]
+
+# Auto-snapshot: persist the current live list when no recent snapshot exists
+if st.session_state.get('api_succeeded') and not st.session_state.get('snapshot_taken'):
+    saved_path = snapshot_utils.auto_snapshot(st.session_state.repos)
+    st.session_state.snapshot_taken = True
+    if saved_path:
+        st.success(f"New snapshot saved: {saved_path}")
 
 repos = st.session_state.repos
 
