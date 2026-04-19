@@ -154,7 +154,14 @@ excluded_repos = {
     "fastgraphml", "arcane.cpp", "lowcode-engine-ext", "Liuma-platform", "lowcode-plugins", "turbo",
     "DegAE_DegradationAutoencoder", "www-project-top-10-low-code-no-code-security-risks", "lowcode-materials",
     "Vibration-Based-Fault-Diagnosis-with-Low-Delay", "alignment-attribution-code", "VideoUIKit-Web-React",
-    "ReGitLint", "pandas-gpt", "yao-knowledge", "snac", "relora", "mettle", "Tenon", "noncode-projects-2024", "EvLight"
+    "ReGitLint", "pandas-gpt", "yao-knowledge", "snac", "relora", "mettle", "Tenon", "noncode-projects-2024", "EvLight",
+
+    # snapshot-2026-04-19 audit: propaganda/search noise, awesome lists, Chinese-only descriptions
+    "china-dictatorship", "china-dictatroship-7", "cihna-dictattorshrip-8", ".github",
+    "awesome-n8n-templates", "awesome-saas", "TopAutomationTools",
+    "Juggle", "app-platform", "bga-god-assistant-config", "flowlong", "form-create",
+    "form-create-designer", "jeelowcode", "jvs", "nebulajs-cloud", "nop-chaos",
+    "pageplug", "qiaoqiaoyun", "react-visual-design", "v6.dooring.public",
 }
 
 # Filter out excluded repositories
