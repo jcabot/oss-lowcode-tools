@@ -129,12 +129,31 @@ excluded_repos = {
 # Filter out excluded repositories
 st.session_state.repos = [repo for repo in st.session_state.repos if repo['name'] not in excluded_repos]
 
-# Auto-snapshot: persist the current live list when no recent snapshot exists
+# Auto-snapshot: persist the current live list when no recent snapshot exists.
+# If a GITHUB_TOKEN secret is configured the snapshot is also committed to the
+# repo so it survives Streamlit Cloud restarts (ephemeral filesystem).
 if st.session_state.get('api_succeeded') and not st.session_state.get('snapshot_taken'):
     saved_path = snapshot_utils.auto_snapshot(st.session_state.repos)
     st.session_state.snapshot_taken = True
     if saved_path:
-        st.success(f"New snapshot saved: {saved_path}")
+        filename = os.path.basename(saved_path)
+        try:
+            gh_token = st.secrets.get("GITHUB_TOKEN")
+        except Exception:
+            gh_token = None
+
+        if gh_token:
+            gh_repo   = st.secrets.get("GITHUB_REPO",   "jcabot/oss-lowcode-tools")
+            gh_branch = st.secrets.get("GITHUB_BRANCH", "main")
+            ok = snapshot_utils.commit_snapshot_to_github(
+                saved_path, gh_token, gh_repo, gh_branch
+            )
+            if ok:
+                st.success(f"New snapshot committed to the repository: snapshots/{filename}")
+            else:
+                st.warning(f"Snapshot saved locally but could not be committed to GitHub: {filename}")
+        else:
+            st.success(f"New snapshot saved locally: {filename}")
 
 repos = st.session_state.repos
 
