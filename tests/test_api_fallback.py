@@ -3,7 +3,7 @@ Test suite for the GitHub API fallback mechanism in the Low-Code Tools Dashboard
 
 This module tests:
 1. Normal GitHub API functionality
-2. Fallback to snapshot.csv when API fails
+2. Fallback to bundled snapshot CSV when API fails
 3. Data format conversion
 4. Error handling
 
@@ -27,7 +27,7 @@ class TestAPIFallback(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.snapshot_path = "snapshot.csv"
+        self.snapshot_path = os.path.join("snapshots", "snapshot-2025-06-06.csv")
         self.test_repo_data = {
             "name": "test-repo",
             "stargazers_count": 100,
@@ -43,12 +43,12 @@ class TestAPIFallback(unittest.TestCase):
         }
     
     def test_snapshot_csv_exists(self):
-        """Test that snapshot.csv file exists."""
-        self.assertTrue(os.path.exists(self.snapshot_path), 
-                       "snapshot.csv file should exist")
+        """Test that bundled snapshot CSV exists."""
+        self.assertTrue(os.path.exists(self.snapshot_path),
+                       "snapshot CSV file should exist")
     
     def test_snapshot_csv_loading(self):
-        """Test loading data from snapshot.csv."""
+        """Test loading data from bundled snapshot CSV."""
         try:
             df = pd.read_csv(self.snapshot_path, encoding='utf-8')
             self.assertGreater(len(df), 0, "Snapshot should contain repositories")
@@ -63,7 +63,7 @@ class TestAPIFallback(unittest.TestCase):
             print(f"[OK] Successfully loaded {len(df)} repositories from snapshot")
             
         except Exception as e:
-            self.fail(f"Failed to load snapshot.csv: {e}")
+            self.fail(f"Failed to load snapshot CSV: {e}")
     
     def test_csv_to_api_format_conversion(self):
         """Test conversion of CSV data to GitHub API format."""
@@ -180,7 +180,7 @@ def run_integration_test():
     
     try:
         # Test normal CSV loading
-        df = pd.read_csv("snapshot.csv", encoding='utf-8')
+        df = pd.read_csv(os.path.join("snapshots", "snapshot-2025-06-06.csv"), encoding='utf-8')
         print(f"[OK] Loaded {len(df)} repositories from snapshot")
         
         # Test data conversion
