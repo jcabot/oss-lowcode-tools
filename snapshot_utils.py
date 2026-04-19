@@ -6,8 +6,10 @@ Snapshot files live in snapshots/ and are named snapshot-YYYY-MM-DD.csv.
 
 from __future__ import annotations
 
+import base64
 import os
 import re
+import requests
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -74,3 +76,42 @@ def auto_snapshot(repos: list[dict]) -> str | None:
         return None  # already taken today
     repos_to_csv(repos, path)
     return path
+
+
+def commit_snapshot_to_github(
+    local_path: str,
+    token: str,
+    repo: str = "jcabot/oss-lowcode-tools",
+    branch: str = "main",
+) -> bool:
+    """Commit the snapshot CSV at *local_path* to GitHub via the Contents API.
+
+    Uses a personal access token with 'contents: write' permission.
+    Returns True on success, False otherwise.
+    """
+    filename = os.path.basename(local_path)
+    repo_path = f"snapshots/{filename}"
+    url = f"https://api.github.com/repos/{repo}/contents/{repo_path}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    with open(local_path, "rb") as f:
+        content_b64 = base64.b64encode(f.read()).decode("ascii")
+
+    # Fetch existing SHA if the file already exists (required for updates)
+    existing = requests.get(url, headers=headers, params={"ref": branch})
+    sha = existing.json().get("sha") if existing.status_code == 200 else None
+
+    payload: dict = {
+        "message": f"Add snapshot {filename}",
+        "content": content_b64,
+        "branch": branch,
+    }
+    if sha:
+        payload["sha"] = sha
+
+    response = requests.put(url, headers=headers, json=payload)
+    return response.status_code in (200, 201)

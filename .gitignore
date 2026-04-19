@@ -12,3 +12,6 @@ __pycache__/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Streamlit secrets (never commit the real token)
+.streamlit/secrets.toml
