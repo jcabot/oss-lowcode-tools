@@ -63,7 +63,7 @@ def display_analysis(repos, category):
         width=700,
         height=500,
         annotations=[{
-            'text': f'Total: {len(repos)}',
+            'text': f'Total: {len(repos_to_analyze)}',
             'x': 0.5,
             'y': 0.5,
             'font_size': 20,

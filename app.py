@@ -274,13 +274,22 @@ min_date = st.slider(
     step=timedelta(days=1)
 )
 
+# Same subset as the main repository table (slider filters). Analysis sections must use this list,
+# not the full session list, so keyword breakdowns match what the table shows.
+filtered_repos = []
+if repos:
+    filtered_repos = [
+        repo
+        for repo in repos
+        if repo["stargazers_count"] >= min_stars
+        and datetime.strptime(repo["pushed_at"].split("T")[0], "%Y-%m-%d").date()
+        >= min_date.date()
+    ]
 
 
 if repos:
     # Create a table with repository information. Only repos with stars >= min_stars and last commit >= min_date are shown
     table_data = []
-
-    filtered_repos = [repo for repo in repos if repo['stargazers_count'] >= min_stars and datetime.strptime(repo['pushed_at'].split('T')[0], '%Y-%m-%d').date() >= min_date.date()]
   
     for repo in filtered_repos:
         table_data.append({
@@ -415,7 +424,7 @@ if 'repos' in st.session_state and st.session_state.repos:
     
     for keyword in ['no-code', 'modeling', 'uml', 'ai']:
         st.write(f"### Analysis for '{keyword}'")
-        display_analysis(st.session_state.repos, keyword)
+        display_analysis(filtered_repos, keyword)
         st.markdown("---")
 else:
     st.warning("Please fetch repositories first using the search functionality above.")
